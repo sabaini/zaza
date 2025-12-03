@@ -38,7 +38,7 @@ jobs:
           # - 3.1/stable
           # - 3.2/stable
           # - 3.3/stable
-          - 3.4/stable
+          - 3.6/stable
         bundle:
           - first
           - second
@@ -59,9 +59,9 @@ jobs:
           # - juju_channel: 3.3/stable
           #   snap_install_flags: ""
           #   pip_constraints: constraints-juju33.txt
-          - juju_channel: 3.4/stable
+          - juju_channel: 3.6/stable
             snap_install_flags: ""
-            pip_constraints: constraints-juju34.txt
+            pip_constraints: constraints-juju36.txt
             juju3: 1
     env:
       TEST_ZAZA_BUG_LP1987332: "on"  # http://pad.lv/1987332
