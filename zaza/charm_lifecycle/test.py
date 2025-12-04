@@ -208,13 +208,15 @@ def add_config_option(config_item):
     global_options.set_option(option, value)
 
 
-def main():
+def main(argv=None):
     """Run the tests defined by the command line args.
 
     Run the tests defined by the command line args or if none were provided
     read the tests from the charms tests.yaml config file
+
+    :param argv: List of command line arguments
     """
-    args = parse_args(sys.argv[1:])
+    args = parse_args(argv if argv else sys.argv[1:])
     cli_utils.setup_logging(log_level=args.loglevel.upper())
     zaza.model.set_juju_model_aliases(args.model)
     utils.set_base_test_dir(test_dir=args.test_directory)

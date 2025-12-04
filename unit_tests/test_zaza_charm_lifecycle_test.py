@@ -114,3 +114,17 @@ class TestCharmLifecycleTest(ut_utils.BaseTestCase):
         # Using args
         args = lc_test.parse_args(['-m', 'model', '--log', 'DEBUG'])
         self.assertEqual(args.loglevel, 'DEBUG')
+
+    def test_main(self):
+        self.patch_object(lc_test, 'parse_args')
+        self.patch_object(lc_test.cli_utils, 'setup_logging')
+        self.patch_object(lc_test, 'run_test_list')
+        args_mock = mock.MagicMock()
+        args_mock.loglevel = 'DEBUG'
+        args_mock.model = {'default_alias': 'modelname'}
+        args_mock.tests = ['test_class1', 'test_class2']
+        self.parse_args.return_value = args_mock
+        lc_test.main(['-m', 'modelname', 'test_class1', 'test_class2'])
+        self.setup_logging.assert_called_once_with(log_level='DEBUG')
+        self.run_test_list.assert_called_once_with(
+            ['test_class1', 'test_class2'])
