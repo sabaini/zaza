@@ -209,6 +209,10 @@ def sync_wrapper(f, timeout=None):
         if not RUN_LIBJUJU_IN_THREAD:
             # run it in this thread's event loop:
             loop = asyncio.get_event_loop()
+            # create a new loop if the existing one is closed
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
             return loop.run_until_complete(_runner())
 
         # ensure that the thread is created
