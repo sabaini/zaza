@@ -99,7 +99,8 @@ if sys.argv[-1] == 'tag':
 
 setup(
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    # setuptools-scm 10.x is incompatible with Jammy's setuptools 59.6.0.
+    setup_requires=['setuptools_scm<10'],
     entry_points={
         'console_scripts': [
             'functest-run-suite = zaza.charm_lifecycle.func_test_runner:main',
