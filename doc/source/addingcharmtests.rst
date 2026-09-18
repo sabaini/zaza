@@ -95,6 +95,29 @@ wait for an optional target\_deploy\_status stanza can be added::
       ntp:
         workload-status-message: Go for it
 
+Refreshing local charms with resources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``zaza.charm_tests.lifecycle.refresh.CharmRefreshAll`` refreshes deployed
+applications from matching ``<application>.charm`` files in
+``CHARMS_ARTIFACT_DIR``. To supply resources during refresh, append
+semicolon-separated ``application:resource=value`` arguments to the test entry::
+
+    tests:
+      - zaza.charm_tests.lifecycle.refresh.CharmRefreshAll;ceph-osd:epa-orchestrator=/tmp/epa-orchestrator.snap
+
+Each resource is passed as a separate ``--resource name=value`` argument only
+when refreshing the named application. Multiple resources and applications can
+be specified. Values are passed unchanged to Juju: use a local file path or a
+resource revision supported by the refresh operation. Relative file paths are
+relative to the test process's working directory, not ``CHARMS_ARTIFACT_DIR``.
+Entries without resource arguments retain their existing behavior.
+
+If the charm explicitly supports an empty resource as a placeholder, create a
+zero-byte file and pass its path. The helper does not create placeholder files
+or infer whether a resource is optional. Resource arguments for applications
+without a matching local charm or absent from the model are ignored.
+
 Adding tests to zaza
 ~~~~~~~~~~~~~~~~~~~~
 

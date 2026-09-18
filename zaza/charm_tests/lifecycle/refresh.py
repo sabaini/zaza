@@ -29,8 +29,15 @@ class CharmRefreshAll:
 
     test_runner = 'direct_with_args'
 
-    def run(self, *args, **kwargs):
-        """Upgrade all the charms found in a local path."""
+    def run(self, args=None):
+        """Upgrade local charms with optional application-scoped resources.
+
+        :param args: Resource arguments as ``application:resource=value``.
+            Values are passed unchanged to Juju (file paths or revisions).
+        :type args: list[str] or None
+        :returns: Whether the refreshes succeeded.
+        :rtype: bool
+        """
         path = os.environ.get('CHARMS_ARTIFACT_DIR')
         if not path:
             logging.info('CHARMS_ARTIFACT_DIR not set; skipping charm refresh')
@@ -42,6 +49,20 @@ class CharmRefreshAll:
             logging.info('no charms found in path: %s' % str(path))
             return True
 
+        resources = {}
+        for argument in args or []:
+            target, separator, value = argument.partition('=')
+            application, colon, resource = target.partition(':')
+            if not all((separator, colon, application, resource, value)):
+                raise ValueError(
+                    'Expected application:resource=value, got {!r}'.format(
+                        argument))
+            application_resources = resources.setdefault(application, {})
+            if resource in application_resources:
+                raise ValueError('Duplicate resource {}:{}'.format(
+                    application, resource))
+            application_resources[resource] = value
+
         for charm in charms:
             app_name = charm.stem
             try:
@@ -51,8 +72,11 @@ class CharmRefreshAll:
                 continue
 
             logging.info('refreshing charm %s' % app_name)
-            subprocess.check_call([
+            command = [
                 'juju', 'refresh', '--path', str(charm), app_name
-            ])
+            ]
+            for resource, value in resources.get(app_name, {}).items():
+                command.extend(['--resource', '{}={}'.format(resource, value)])
+            subprocess.check_call(command)
 
         return True
